@@ -23,3 +23,29 @@ html, body, #root {
   flex-direction: column;
   background-color: #ffffff;
 }
+
+/* Add these styles to your App.css file */
+
+.chat-header {
+  display: flex;
+  justify-content: flex-end; /* Aligns button to the right */
+  padding: 8px 15px;
+  background-color: #f8f9fa; /* Matches the composer background */
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.reset-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #dc3545; /* A standard red color for reset/delete actions */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reset-button:hover {
+  background-color: #c82333; /* A darker red on hover */
+}

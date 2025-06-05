@@ -1,10 +1,10 @@
-import React, { useMemo, useEffect } from 'react'; // useEffect was for debugging, can be removed if not needed now
+import React, { useMemo, useEffect, useRef } from 'react';
 import {
   Container,
   MessageList,
   Composer,
+  Header,
   useWebchat,
-  // Configuration // Not strictly needed if not using TypeScript features
 } from '@botpress/webchat';
 import './App.css';
 
@@ -14,17 +14,60 @@ function App() {
     clientState,
     messages,
     isTyping,
-    user // Contains user.userId
+    user,
+    newConversation,
   } = useWebchat({
     clientId: "58fc6a41-9d2f-45b8-a671-e39a93603d5e",
   });
 
-  // useEffect(() => { // This was for debugging, can be commented out or removed
-  //   console.log("CurrentUser object from useWebchat:", JSON.stringify(user, null, 2));
-  //   if (messages.length > 0) {
-  //     console.log("Last message from useWebchat:", JSON.stringify(messages[messages.length - 1], null, 2));
-  //   }
-  // }, [messages, user]);
+  const initialEventSent = useRef(false);
+
+  useEffect(() => {
+    if (client && clientState === 'connected' && !initialEventSent.current) {
+      const customPayloadForBot = {
+        action: 'startConversationOnLoad',
+        source: 'reactAppLoad',
+      };
+      if (typeof client.sendEvent === 'function') {
+        client.sendEvent(customPayloadForBot)
+          .then(() => {
+            initialEventSent.current = true;
+          })
+          .catch(error => {
+            console.error("React App: Error sending initial event:", error);
+          });
+      }
+    }
+  }, [client, clientState]);
+
+  // NEW: useEffect for handling custom events from the bot
+  useEffect(() => {
+    // 1. Define the handler function that will process the event
+    const handleCustomEvent = (event) => {
+      console.log("React App: Received custom event from Botpress:", event);
+
+      // 2. Check if the event is the one we're looking for
+      if (event.type === 'redirect' && event.payload?.url) {
+        console.log(`Redirecting to: ${event.payload.url}`);
+        // 3. Perform the redirection
+        window.location.href = event.payload.url;
+      }
+    };
+
+    // 4. Add the event listener to the `window.botpress` object
+    // We check if `window.botpress` is available first, as it might load asynchronously
+    if (window.botpress) {
+      window.botpress.on('customEvent', handleCustomEvent);
+    }
+
+    // 5. Return a cleanup function to remove the listener when the component unmounts
+    // This is crucial to prevent memory leaks in a React application
+    return () => {
+      if (window.botpress) {
+        window.botpress.off('customEvent', handleCustomEvent);
+      }
+    };
+  }, []); // The empty dependency array [] ensures this effect runs only once on mount
 
   const botConfig = {
     botName: 'Riley | Your Financial Concierge',
@@ -35,8 +78,7 @@ function App() {
   const enrichedMessages = useMemo(() => {
     return messages.map((message) => {
       const authorId = message.authorId;
-      // CORRECTED LINE: Use user?.userId instead of user?.id
-      const direction = authorId === user?.userId ? 'outgoing' : 'incoming'; // <<<< Key fix
+      const direction = authorId === user?.userId ? 'outgoing' : 'incoming';
       return {
         ...message,
         direction,
@@ -46,8 +88,7 @@ function App() {
             : { name: botConfig.botName ?? 'Bot', avatar: botConfig.botAvatar },
       };
     });
-    // Update dependency array to use user?.userId
-  }, [botConfig.botAvatar, botConfig.botName, messages, user?.userId, user?.name, user?.pictureUrl]); // <<<< Dependency array updated
+  }, [botConfig.botAvatar, botConfig.botName, messages, user?.userId, user?.name, user?.pictureUrl]);
 
   return (
     <div className="full-page-chat-app-wrapper">
@@ -55,15 +96,21 @@ function App() {
         connected={clientState !== 'disconnected'}
         className="botpress-chat-container-fullpage"
       >
+        <Header
+          restartConversation={newConversation}
+          configuration={{
+              botName: botConfig.botName,
+              botDescription: botConfig.botDescription,
+              botAvatar: botConfig.botAvatar,
+          }}
+        />
+
         <MessageList
           botAvatar={botConfig.botAvatar}
           botName={botConfig.botName}
           isTyping={isTyping}
           messages={enrichedMessages}
           sendMessage={client?.sendMessage}
-          botDescription={botConfig.botDescription}
-          headerMessage="Welcome! How can I assist you today?"
-          showMarquee={true}
           style={{
             flexGrow: 1,
             overflowY: 'auto',
