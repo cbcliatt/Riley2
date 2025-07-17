@@ -1,9 +1,10 @@
+/* This sets up the foundation for a true full-screen app */
 html, body, #root {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: hidden; /* Prevents unwanted scrollbars on the body */
   box-sizing: border-box;
 }
 
@@ -11,9 +12,10 @@ html, body, #root {
   box-sizing: inherit;
 }
 
+/* CORRECTED: Use 100% height instead of 100vh */
 .full-page-chat-app-wrapper {
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
   display: flex;
 }
 
@@ -24,13 +26,12 @@ html, body, #root {
   background-color: #ffffff;
 }
 
-/* Add these styles to your App.css file */
-
+/* The rest of your styles are fine */
 .chat-header {
   display: flex;
-  justify-content: flex-end; /* Aligns button to the right */
+  justify-content: flex-end;
   padding: 8px 15px;
-  background-color: #f8f9fa; /* Matches the composer background */
+  background-color: #f8f9fa;
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -39,7 +40,7 @@ html, body, #root {
   font-size: 14px;
   font-weight: bold;
   color: #fff;
-  background-color: #dc3545; /* A standard red color for reset/delete actions */
+  background-color: #dc3545;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -47,5 +48,5 @@ html, body, #root {
 }
 
 .reset-button:hover {
-  background-color: #c82333; /* A darker red on hover */
+  background-color: #c82333;
 }
