@@ -15,66 +15,33 @@ function App() {
     messages,
     isTyping,
     user,
-    newConversation,
+    newConversation, // Make sure you are destructuring this from the hook
   } = useWebchat({
+    // IMPORTANT: Replace with your actual clientId from Botpress Studio
     clientId: "58fc6a41-9d2f-45b8-a671-e39a93603d5e",
   });
 
-  const initialEventSent = useRef(false);
+  // Use a ref to ensure the conversation is only started once per component load
+  const hasStartedConversation = useRef(false);
 
+  // This improved useEffect hook waits for the client to be fully connected
+  // before starting a new conversation. This prevents race conditions.
   useEffect(() => {
-    if (client && clientState === 'connected' && !initialEventSent.current) {
-      const customPayloadForBot = {
-        action: 'startConversationOnLoad',
-        source: 'reactAppLoad',
-      };
-      if (typeof client.sendEvent === 'function') {
-        client.sendEvent(customPayloadForBot)
-          .then(() => {
-            initialEventSent.current = true;
-          })
-          .catch(error => {
-            console.error("React App: Error sending initial event:", error);
-          });
-      }
+    if (clientState === 'connected' && newConversation && !hasStartedConversation.current) {
+      newConversation();
+      // Set the flag to true so this doesn't run again
+      hasStartedConversation.current = true;
     }
-  }, [client, clientState]);
+  }, [clientState, newConversation]); // Rerun this effect if the connection state changes
 
-  // NEW: useEffect for handling custom events from the bot
-  useEffect(() => {
-    // 1. Define the handler function that will process the event
-    const handleCustomEvent = (event) => {
-      console.log("React App: Received custom event from Botpress:", event);
-
-      // 2. Check if the event is the one we're looking for
-      if (event.type === 'redirect' && event.payload?.url) {
-        console.log(`Redirecting to: ${event.payload.url}`);
-        // 3. Perform the redirection
-        window.location.href = event.payload.url;
-      }
-    };
-
-    // 4. Add the event listener to the `window.botpress` object
-    // We check if `window.botpress` is available first, as it might load asynchronously
-    if (window.botpress) {
-      window.botpress.on('customEvent', handleCustomEvent);
-    }
-
-    // 5. Return a cleanup function to remove the listener when the component unmounts
-    // This is crucial to prevent memory leaks in a React application
-    return () => {
-      if (window.botpress) {
-        window.botpress.off('customEvent', handleCustomEvent);
-      }
-    };
-  }, []); // The empty dependency array [] ensures this effect runs only once on mount
-
+  // Static configuration for your bot's appearance
   const botConfig = {
     botName: 'Riley | Your Financial Concierge',
     botAvatar: 'https://files.bpcontent.cloud/2025/05/11/13/20250511134230-W43EOBJX.jpeg',
     botDescription: 'Find your perfect financial match today!',
   };
 
+  // Memoized logic to enrich messages with sender info (for display)
   const enrichedMessages = useMemo(() => {
     return messages.map((message) => {
       const authorId = message.authorId;
@@ -90,6 +57,7 @@ function App() {
     });
   }, [botConfig.botAvatar, botConfig.botName, messages, user?.userId, user?.name, user?.pictureUrl]);
 
+  // JSX to render the full-page chat interface
   return (
     <div className="full-page-chat-app-wrapper">
       <Container
@@ -99,9 +67,9 @@ function App() {
         <Header
           restartConversation={newConversation}
           configuration={{
-              botName: botConfig.botName,
-              botDescription: botConfig.botDescription,
-              botAvatar: botConfig.botAvatar,
+            botName: botConfig.botName,
+            botDescription: botConfig.botDescription,
+            botAvatar: botConfig.botAvatar,
           }}
         />
 
