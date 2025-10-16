@@ -1,52 +1,722 @@
-/* This sets up the foundation for a true full-screen app */
-html, body, #root {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden; /* Prevents unwanted scrollbars on the body */
-  box-sizing: border-box;
-}
-
-*, *::before, *::after {
-  box-sizing: inherit;
-}
-
-/* CORRECTED: Use 100% height instead of 100vh */
-.full-page-chat-app-wrapper {
-  height: 100%;
-  width: 100%;
-  display: flex;
-}
-
-.botpress-chat-container-fullpage {
-  flex-grow: 1;
+.advisor-scroll-rows {
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
+  gap: 16px;
+  margin-top: 8px;
 }
 
-/* The rest of your styles are fine */
-.chat-header {
+.advisor-scroll-container {
+  width: calc(6 * 48px + 5 * 12px); /* Width for exactly 6 images + gaps */
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+  /* Gradient fade effect on sides */
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.advisor-scroll-track {
   display: flex;
-  justify-content: flex-end;
-  padding: 8px 15px;
-  background-color: #f8f9fa;
+  gap: 12px;
+  width: fit-content;
+  will-change: transform;
+}
+
+.advisor-avatar-wrapper {
+  flex-shrink: 0;
+  width: 48px;
+}
+
+.advisor-avatar-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  display: block;
+  transition: opacity 0.5s ease;
+}
+img.puzzleimg {
+    max-width: 38px;
+}
+
+.advisor-avatar-img.advisor-faded {
+  opacity: 0.2;
+}
+
+.advisor-scroll-left {
+  animation: scroll-left 40s linear infinite;
+}
+
+.advisor-scroll-right {
+  animation: scroll-right 40s linear infinite;
+}
+
+@keyframes scroll-left {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(calc(-50% - 6px));
+  }
+}
+
+@keyframes scroll-right {
+  from {
+    transform: translateX(calc(-50% - 6px));
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+/* Custom event banner */
+.custom-event-banner {
+  background: #ffe9c7;
+  color: #7a4a00;
+  padding: 12px 24px;
+  border-radius: 8px;
+  margin: 16px auto;
+  max-width: 600px;
+  font-size: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+/* Reset and base styles */
+body, html, #root, .app-container {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: #f7fafd;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 40px 20px 40px;
+  background: white;
+  box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.075);
+}
+.logo-section {
+  display: flex;
+  align-items: center;
+}
+.logo-section a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+.logo {
+  height: 32px;
+  margin-right: 12px;
+}
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+.nav-links a {
+  color: #222;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+.nav-links a:hover {
+  color: #2b9fd9;
+}
+.nav-links a.active {
+  color: #2b9fd9;
+  font-weight: 600;
+}
+.menu-icon {
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.menu-icon:hover {
+  color: #2b9fd9;
+}
+
+/* Mobile Menu Styles */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  animation: fadeIn 0.3s ease;
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 80vw;
+  background: white;
+  box-shadow: -2px 0 16px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  animation: slideIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
   border-bottom: 1px solid #e0e0e0;
 }
 
-.reset-button {
-  padding: 6px 12px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #fff;
-  background-color: #dc3545;
+.close-menu {
+  background: none;
   border: none;
-  border-radius: 5px;
+  font-size: 2rem;
+  color: #666;
   cursor: pointer;
-  transition: background-color 0.2s;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
 }
 
-.reset-button:hover {
-  background-color: #c82333;
+.close-menu:hover {
+  color: #2b9fd9;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+}
+
+.mobile-menu-links a {
+  color: #222;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.1rem;
+  padding: 16px 24px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.mobile-menu-links a:hover {
+  background-color: #f7fafd;
+  color: #2b9fd9;
+}
+
+.mobile-menu-links a.active {
+  color: #2b9fd9;
+  font-weight: 600;
+  background-color: #f0f7ff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .header {
+    padding: 16px 20px;
+  }
+  
+  .logo {
+    height: 28px;
+  }
+  
+  .nav-links {
+    display: none;
+  }
+  
+  .menu-icon {
+    display: block;
+  }
+}
+
+/* Hamburger menu icon visible on all screen sizes */
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 32px auto 0 auto;
+  align-items: flex-start;
+}
+.chat-section {
+  width: 100%;
+}
+.chat-header {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #2b7cff;
+}
+.chat-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  padding: 0;
+  height: 600px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.botpress-chat-container {
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  padding: 24px;
+  overflow-x: clip;
+}
+
+/* Perfect Match Process Styles */
+.process-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.process-icon {
+  font-size: 1.8rem;
+}
+.process-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #000;
+}
+.process-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.process-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.step-number {
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #8b8b8b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.step-number-blue {
+  background: #2b9fd9;
+}
+.step-number-teal {
+  background: #3dd8c8;
+}
+.step-content {
+  flex: 1;
+}
+.step-content h4 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #000;
+}
+.step-content p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.4;
+}
+
+.advisors-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.potential-advisors h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #000;
+}
+
+.match-score-display {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.match-score-display-mobile {
+  display: none; /* Hide on desktop */
+}
+
+.circular-progress {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle {
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+.progress-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.match-percentage {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #000;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.match-label {
+  font-size: 0.65rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.advisor-count {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 8px;
+  display: block;
+}
+.advisor-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+.advisor-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e3e8f0;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.feature-section {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  max-width: 1100px;
+  margin: 48px auto 32px auto;
+  padding: 48px 60px;
+  text-align: center;
+}
+.feature-section h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+}
+.feature-subtitle {
+  font-size: 1.05rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+.features-grid {
+  display: flex;
+  justify-content: space-around;
+  gap: 48px;
+  margin-top: 48px;
+}
+.feature-card {
+  flex: 1;
+  background: none;
+  box-shadow: none;
+  border-radius: 12px;
+  padding: 0 12px;
+  text-align: center;
+}
+.feature-icon-bubble {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.feature-icon-bubble img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.feature-card h4 {
+  margin: 0 0 12px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #000;
+}
+.feature-card p {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Mobile Process Popup */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.mobile-process-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  animation: popupSlideIn 0.3s ease;
+  overflow-y: auto;
+}
+
+.popup-content {
+  padding: 32px 24px;
+}
+
+.get-started-btn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 24px;
+  background: #3DD8C8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.get-started-btn:hover {
+  background: #35c4b5;
+}
+
+@keyframes popupSlideIn {
+  from {
+    transform: translate(-50%, -40%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+    gap: 8px; /* Reduce gap between sections */
+    margin-top: 5px; /* Reduce top margin */
+  }
+  .sidebar {
+    flex-direction: column;
+    gap: 0; /* Remove gap between cards */
+    order: -1; /* Move sidebar above chat section */
+  }
+  button.bpReset.bpComposerVoiceButtonContainer svg {
+    background: #3dd8c8;
+}
+  .match-process {
+    display: none; /* Hide the Perfect Match Process card on mobile */
+  }
+  .potential-advisors.card {
+    padding: 2px 16px; /* Minimal top/bottom padding */
+    background: transparent; /* Make transparent */
+    box-shadow: none; /* Remove shadow */
+  }
+  .advisors-header {
+    display: none; /* Hide the entire header section */
+  }
+  .potential-advisors h3 {
+    display: none; /* Hide heading */
+  }
+  .match-score-display {
+    display: none; /* Hide from header on mobile */
+  }
+  .match-score-display-mobile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .advisor-scroll-rows {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    margin-top: 0;
+  }
+  .advisor-scroll-container-wrapper {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .advisor-scroll-container-wrapper > div:last-child {
+    display: none; /* Hide bottom row on mobile */
+  }
+  .circular-progress {
+    width: 60px; /* Smaller circle */
+    height: 60px;
+    flex-shrink: 0;
+  }
+  .progress-ring {
+    width: 60px;
+    height: 60px;
+  }
+  .progress-ring circle {
+    r: 25; /* Smaller radius */
+    cx: 30;
+    cy: 30;
+  }
+  .match-percentage {
+    font-size: 1rem; /* Smaller percentage */
+  }
+  .match-label {
+    font-size: 0.6rem; /* Smaller label */
+  }
+  .advisor-scroll-rows {
+    overflow: hidden; /* Prevent horizontal scroll */
+    width: 100%;
+  }
+  .advisor-scroll-container {
+    width: 100% !important; /* Override fixed width on mobile */
+    max-width: 100%;
+    margin: 0;
+  }
+  .potential-advisors.card {
+    overflow: hidden; /* Prevent horizontal scroll from card */
+  }
+  .sidebar {
+    overflow: hidden; /* Prevent overflow from sidebar */
+  }
+  .advisor-avatar-img {
+    width: 40px; /* Smaller avatars */
+    height: 40px;
+  }
+  .advisor-avatar-wrapper {
+    width: 40px;
+  }
+  .advisor-scroll-track {
+    gap: 8px; /* Reduce gap on mobile */
+  }
+  .chat-section {
+    order: 1;
+  }
+  .main-grid {
+    padding: 0 6px; /* Add padding to main grid instead */
+  }
+  /* Make Botpress header more compact on mobile */
+  .botpress-chat-container header {
+    padding: 8px 12px !important;
+    min-height: auto !important;
+  }
+  .chat-card {
+    border-radius: 12px; /* Slightly less rounded on mobile */
+  }
+  .feature-section {
+    margin: 12px 6px 0 6px; /* Add top margin and left/right margin */
+    padding: 20px 10px;
+  }
+  .feature-section h2 {
+    font-size: 1.5rem; /* Smaller heading */
+  }
+  .feature-subtitle {
+    font-size: 0.9rem; /* Smaller subtitle */
+  }
+  .feature-card h4 {
+    font-size: 1rem; /* Smaller feature titles */
+  }
+  .feature-card p {
+    font-size: 0.85rem; /* Smaller feature descriptions */
+  }
+  .feature-icon-bubble {
+    width: 60px; /* Smaller icons */
+    height: 60px;
+    margin-bottom: 12px;
+  }
+  .features-grid {
+    flex-direction: column;
+    gap: 18px;
+  }
 }
