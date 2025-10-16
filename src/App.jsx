@@ -72,17 +72,14 @@ function App() {
   
   // State for mobile process popup
   const [showMobileProcessPopup, setShowMobileProcessPopup] = useState(false);
+  const hasShownPopupRef = useRef(false);
   
-  // Show popup on mobile on page load
+  // Show popup on mobile on page load (only once)
   useEffect(() => {
-    const checkMobile = () => {
-      if (window.innerWidth <= 900) {
-        setShowMobileProcessPopup(true);
-      }
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    if (!hasShownPopupRef.current && window.innerWidth <= 900) {
+      setShowMobileProcessPopup(true);
+      hasShownPopupRef.current = true;
+    }
   }, []);
 
   // Track message count and log every message
